@@ -1,0 +1,4 @@
+server:
+  port: 2182
+zookeeper:
+  port: 2181

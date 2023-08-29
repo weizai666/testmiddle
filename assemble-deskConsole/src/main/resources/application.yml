@@ -1,0 +1,130 @@
+server:
+  port: 8000
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+spring:
+  application:
+    name: desk-console
+  aop:
+    proxy-target-class: true
+  profiles:
+    active: task-queue,minio-client,delayed-queue,uuid-key,event-bus,distribute-lock
+  boot:
+    admin:
+      client:
+        url: http://${GATEWAY_ADDRESS:127.0.0.1}
+        auto-registration: true
+        instance:
+            prefer-ip: true
+
+---
+
+# minio-client
+
+spring:
+  profiles: minio-client
+  servlet:
+    multipart:
+      file-size-threshold: 500MB
+      maxRequestSize: 500MB
+      maxFileSize: 500MB
+
+file:
+  store:
+    minio:
+      endpoint: http://${MINIO_ADDRESS:127.0.0.1}:9000
+      bucket: oss-server
+      access-key: libo
+      secret-key: 569590478
+      tmp-dir: ./tmp/
+      tmp-clean: true
+      tmp-first-clean-time: 2021-12-17 11:45:00
+      tmp-clean-period: 12960000
+      tmp-alive-duration: 12960000
+
+
+---
+
+### delayed-queue
+
+spring:
+  profiles: delayed-queue
+  redis:
+    database: 0
+    host: ${REDIS_ADDRESS:127.0.0.1}
+    port: 6379
+#    password:
+#    ssl:
+    timeout: 10S
+#    cluster:
+#      nodes:
+#    sentinel:
+#      master:
+#      nodes:
+---
+
+### task-queue
+
+spring:
+  profiles: task-queue
+  datasource:
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_ADDRESS:127.0.0.1}:3306/callcenter?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapper/*.xml
+
+---
+
+### event-bus
+
+spring:
+  profiles: event-bus
+event-bus:
+  model: all
+
+
+---
+
+
+### uuid-key
+
+spring:
+  profiles: uuid-key
+  datasource:
+    username: root
+    password: root
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${MYSQL_ADDRESS:127.0.0.1}:3306/callcenter?useUnicode=true&characterEncoding=utf-8&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=Asia/Shanghai
+
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+  mapper-locations: classpath*:/mapper/*.xml
+
+---
+
+#### distribute-lock
+
+spring:
+  profiles: distribute-lock
+  redis:
+    database: 0
+    host: ${REDIS_ADDRESS:127.0.0.1}
+    port: 6379
+#    password:
+    #    ssl:
+    timeout: 10S
+#    cluster:
+#      nodes:
+#    sentinel:
+#      master:
+#      nodes:

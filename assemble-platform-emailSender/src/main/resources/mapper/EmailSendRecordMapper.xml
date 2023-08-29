@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyts.assemble.emailSender.mapper.IEmailSendRecordMapper">
+
+    <!-- 通用查询映射结果 -->
+    <resultMap id="BaseResultMap" type="com.hyts.assemble.emailSender.core.bean.EmailSendRecordEntity">
+        <id column="id" property="id" />
+        <result column="title" property="title" />
+        <result column="content" property="content" />
+        <result column="type" property="type" />
+        <result column="rece_users" property="receUsers" />
+        <result column="copy_users" property="copyUsers" />
+        <result column="send_status" property="sendStatus" />
+        <result column="cron_expression" property="cronExpression" />
+        <result column="next_plan_datetime" property="nextPlanDatetime" />
+        <result column="last_send_datetime" property="lastSendDatetime" />
+        <result column="execute_status" property="executeStatus" />
+        <result column="execute_threshold" property="executeThreshold" />
+        <result column="execute_send_count" property="executeSendCount" />
+        <result column="create_datetime" property="createDatetime" />
+        <result column="is_html" property="isHtml" />
+        <result column="attachments" property="attachments" />
+    </resultMap>
+
+    <!-- 通用查询结果列 -->
+    <sql id="Base_Column_List">
+        id, title, content, type, rece_users, copy_users, send_status, cron_expression, next_plan_datetime, last_send_datetime, execute_status, execute_threshold, execute_send_count, create_datetime, is_html, attachments
+    </sql>
+
+</mapper>

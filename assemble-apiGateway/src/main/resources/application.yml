@@ -1,0 +1,35 @@
+server:
+  port: 8001
+spring:
+  boot:
+    admin:
+      client:
+        url: http://127.0.0.1:${server.port}
+        auto-registration: true
+        instance:
+          prefer-ip: true
+  application:
+    name: api-gateway
+  cloud:
+    gateway:
+      discovery:
+        locator:
+          # 自动根据服务名 提供 路由转发
+          enabled: true
+          # 服务名小写开启
+          lower-case-service-id: true
+      enabled: true
+
+#开放端点用于SpringBoot Admin的监控
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+
+assemble:
+  security:
+    auth-url: http://auth-security
+    ignore-path:
+      - /account/login/**
+      - /actuator/**

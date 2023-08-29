@@ -1,0 +1,27 @@
+POST http://localhost:8080/email/send/record/send
+Content-Type: application/json
+
+{
+  "namespace":"c020c20d-164a-4685-ad7f-05600d16906b",
+  "title":"测试邮件",
+  "content":"AXMKEONFJKSXAVJR",
+  "receUsers":"bo.li@wiz.ai"
+}
+
+
+
+###
+POST http://localhost:8080/email/send/config/create
+Content-Type: application/json
+
+{
+  "hostname":"smtp.163.com",
+  "username":"haoyutianshang@163.com",
+  "password":"AXMKEONFJKSXAVJR",
+  "template":"nihao"
+}
+
+###
+
+
+

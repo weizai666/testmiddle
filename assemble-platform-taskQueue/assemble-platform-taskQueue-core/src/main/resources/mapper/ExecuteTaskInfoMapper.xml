@@ -1,0 +1,467 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.hyts.assemble.taskqueue.dao.ExecuteTaskInfoMapper">
+  <resultMap id="BaseResultMap" type="com.hyts.assemble.taskqueue.model.ExecuteTaskInfo">
+    <id column="execute_task_id" jdbcType="BIGINT" property="executeTaskId" />
+    <result column="execute_task_code" jdbcType="VARCHAR" property="executeTaskCode" />
+    <result column="execute_biz_code" jdbcType="VARCHAR" property="executeBizCode" />
+    <result column="execute_task_type" jdbcType="TINYINT" property="executeTaskType" />
+    <result column="execute_task_status" jdbcType="TINYINT" property="executeTaskStatus" />
+    <result column="execute_task_name" jdbcType="VARCHAR" property="executeTaskName" />
+    <result column="execute_task_duration" jdbcType="BIGINT" property="executeTaskDuration" />
+    <result column="execute_task_result" jdbcType="VARCHAR" property="executeTaskResult" />
+    <result column="execute_start_time" jdbcType="TIMESTAMP" property="executeStartTime" />
+    <result column="execute_stop_time" jdbcType="TIMESTAMP" property="executeStopTime" />
+    <result column="execute_input_param" jdbcType="CHAR" property="executeInputParam" />
+    <result column="is_delete" jdbcType="TINYINT" property="isDelete" />
+    <result column="department_id" jdbcType="BIGINT" property="departmentId" />
+    <result column="enterprise_id" jdbcType="BIGINT" property="enterpriseId" />
+    <result column="user_id" jdbcType="BIGINT" property="userId" />
+    <result column="update_time" jdbcType="TIMESTAMP" property="updateTime" />
+    <result column="create_time" jdbcType="TIMESTAMP" property="createTime" />
+    <result column="result_data_size" jdbcType="BIGINT" property="resultDataSize" />
+    <result column="result_expire_time" jdbcType="TIMESTAMP" property="resultExpireTime" />
+    <result column="failure_retry_count" jdbcType="INTEGER" property="failureRetryCount" />
+    <result column="failure_reason" jdbcType="VARCHAR" property="failureReason" />
+  </resultMap>
+  <sql id="Example_Where_Clause">
+    <where>
+      <foreach collection="oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Update_By_Example_Where_Clause">
+    <where>
+      <foreach collection="example.oredCriteria" item="criteria" separator="or">
+        <if test="criteria.valid">
+          <trim prefix="(" prefixOverrides="and" suffix=")">
+            <foreach collection="criteria.criteria" item="criterion">
+              <choose>
+                <when test="criterion.noValue">
+                  and ${criterion.condition}
+                </when>
+                <when test="criterion.singleValue">
+                  and ${criterion.condition} #{criterion.value}
+                </when>
+                <when test="criterion.betweenValue">
+                  and ${criterion.condition} #{criterion.value} and #{criterion.secondValue}
+                </when>
+                <when test="criterion.listValue">
+                  and ${criterion.condition}
+                  <foreach close=")" collection="criterion.value" item="listItem" open="(" separator=",">
+                    #{listItem}
+                  </foreach>
+                </when>
+              </choose>
+            </foreach>
+          </trim>
+        </if>
+      </foreach>
+    </where>
+  </sql>
+  <sql id="Base_Column_List">
+    execute_task_id, execute_task_code, execute_biz_code, execute_task_type, execute_task_status, 
+    execute_task_name, execute_task_duration, execute_task_result, execute_start_time, 
+    execute_stop_time, execute_input_param, is_delete, department_id, enterprise_id, 
+    user_id, update_time, create_time, result_data_size, result_expire_time, failure_retry_count, 
+    failure_reason
+  </sql>
+  <select id="selectByExample" parameterType="com.hyts.assemble.taskqueue.dao.ExecuteTaskInfoExample" resultMap="BaseResultMap">
+    select
+    <if test="distinct">
+      distinct
+    </if>
+    <include refid="Base_Column_List" />
+    from execute_task_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+    <if test="orderByClause != null">
+      order by ${orderByClause}
+    </if>
+  </select>
+  <select id="selectByPrimaryKey" parameterType="java.lang.Long" resultMap="BaseResultMap">
+    select 
+    <include refid="Base_Column_List" />
+    from execute_task_info
+    where execute_task_id = #{executeTaskId,jdbcType=BIGINT}
+  </select>
+  <delete id="deleteByPrimaryKey" parameterType="java.lang.Long">
+    delete from execute_task_info
+    where execute_task_id = #{executeTaskId,jdbcType=BIGINT}
+  </delete>
+  <delete id="deleteByExample" parameterType="com.hyts.assemble.taskqueue.dao.ExecuteTaskInfoExample">
+    delete from execute_task_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </delete>
+  <insert id="insert" parameterType="com.hyts.assemble.taskqueue.model.ExecuteTaskInfo" >
+    insert into execute_task_info (execute_task_id, execute_task_code, execute_biz_code, 
+      execute_task_type, execute_task_status, execute_task_name, 
+      execute_task_duration, execute_task_result, 
+      execute_start_time, execute_stop_time, 
+      execute_input_param, is_delete, department_id, 
+      enterprise_id, user_id, update_time, 
+      create_time, result_data_size, result_expire_time, 
+      failure_retry_count, failure_reason)
+    values (#{executeTaskId,jdbcType=BIGINT}, #{executeTaskCode,jdbcType=VARCHAR}, #{executeBizCode,jdbcType=VARCHAR}, 
+      #{executeTaskType,jdbcType=TINYINT}, #{executeTaskStatus,jdbcType=TINYINT}, #{executeTaskName,jdbcType=VARCHAR}, 
+      #{executeTaskDuration,jdbcType=BIGINT}, #{executeTaskResult,jdbcType=VARCHAR}, 
+      #{executeStartTime,jdbcType=TIMESTAMP}, #{executeStopTime,jdbcType=TIMESTAMP}, 
+      #{executeInputParam,jdbcType=CHAR}, #{isDelete,jdbcType=TINYINT}, #{departmentId,jdbcType=BIGINT}, 
+      #{enterpriseId,jdbcType=BIGINT}, #{userId,jdbcType=BIGINT}, #{updateTime,jdbcType=TIMESTAMP}, 
+      #{createTime,jdbcType=TIMESTAMP}, #{resultDataSize,jdbcType=BIGINT}, #{resultExpireTime,jdbcType=TIMESTAMP}, 
+      #{failureRetryCount,jdbcType=INTEGER}, #{failureReason,jdbcType=VARCHAR})
+  </insert>
+  <insert id="insertSelective" parameterType="com.hyts.assemble.taskqueue.model.ExecuteTaskInfo" useGeneratedKeys="true" keyProperty="executeTaskId" keyColumn="execute_task_id" >
+    insert into execute_task_info
+    <trim prefix="(" suffix=")" suffixOverrides=",">
+      <if test="executeTaskId != null">
+        execute_task_id,
+      </if>
+      <if test="executeTaskCode != null">
+        execute_task_code,
+      </if>
+      <if test="executeBizCode != null">
+        execute_biz_code,
+      </if>
+      <if test="executeTaskType != null">
+        execute_task_type,
+      </if>
+      <if test="executeTaskStatus != null">
+        execute_task_status,
+      </if>
+      <if test="executeTaskName != null">
+        execute_task_name,
+      </if>
+      <if test="executeTaskDuration != null">
+        execute_task_duration,
+      </if>
+      <if test="executeTaskResult != null">
+        execute_task_result,
+      </if>
+      <if test="executeStartTime != null">
+        execute_start_time,
+      </if>
+      <if test="executeStopTime != null">
+        execute_stop_time,
+      </if>
+      <if test="executeInputParam != null">
+        execute_input_param,
+      </if>
+      <if test="isDelete != null">
+        is_delete,
+      </if>
+      <if test="departmentId != null">
+        department_id,
+      </if>
+      <if test="enterpriseId != null">
+        enterprise_id,
+      </if>
+      <if test="userId != null">
+        user_id,
+      </if>
+      <if test="updateTime != null">
+        update_time,
+      </if>
+      <if test="createTime != null">
+        create_time,
+      </if>
+      <if test="resultDataSize != null">
+        result_data_size,
+      </if>
+      <if test="resultExpireTime != null">
+        result_expire_time,
+      </if>
+      <if test="failureRetryCount != null">
+        failure_retry_count,
+      </if>
+      <if test="failureReason != null">
+        failure_reason,
+      </if>
+    </trim>
+    <trim prefix="values (" suffix=")" suffixOverrides=",">
+      <if test="executeTaskId != null">
+        #{executeTaskId,jdbcType=BIGINT},
+      </if>
+      <if test="executeTaskCode != null">
+        #{executeTaskCode,jdbcType=VARCHAR},
+      </if>
+      <if test="executeBizCode != null">
+        #{executeBizCode,jdbcType=VARCHAR},
+      </if>
+      <if test="executeTaskType != null">
+        #{executeTaskType,jdbcType=TINYINT},
+      </if>
+      <if test="executeTaskStatus != null">
+        #{executeTaskStatus,jdbcType=TINYINT},
+      </if>
+      <if test="executeTaskName != null">
+        #{executeTaskName,jdbcType=VARCHAR},
+      </if>
+      <if test="executeTaskDuration != null">
+        #{executeTaskDuration,jdbcType=BIGINT},
+      </if>
+      <if test="executeTaskResult != null">
+        #{executeTaskResult,jdbcType=VARCHAR},
+      </if>
+      <if test="executeStartTime != null">
+        #{executeStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="executeStopTime != null">
+        #{executeStopTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="executeInputParam != null">
+        #{executeInputParam,jdbcType=CHAR},
+      </if>
+      <if test="isDelete != null">
+        #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="departmentId != null">
+        #{departmentId,jdbcType=BIGINT},
+      </if>
+      <if test="enterpriseId != null">
+        #{enterpriseId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="resultDataSize != null">
+        #{resultDataSize,jdbcType=BIGINT},
+      </if>
+      <if test="resultExpireTime != null">
+        #{resultExpireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="failureRetryCount != null">
+        #{failureRetryCount,jdbcType=INTEGER},
+      </if>
+      <if test="failureReason != null">
+        #{failureReason,jdbcType=VARCHAR},
+      </if>
+    </trim>
+  </insert>
+  <select id="countByExample" parameterType="com.hyts.assemble.taskqueue.dao.ExecuteTaskInfoExample" resultType="java.lang.Long">
+    select count(*) from execute_task_info
+    <if test="_parameter != null">
+      <include refid="Example_Where_Clause" />
+    </if>
+  </select>
+  <update id="updateByExampleSelective" parameterType="map">
+    update execute_task_info
+    <set>
+      <if test="record.executeTaskId != null">
+        execute_task_id = #{record.executeTaskId,jdbcType=BIGINT},
+      </if>
+      <if test="record.executeTaskCode != null">
+        execute_task_code = #{record.executeTaskCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.executeBizCode != null">
+        execute_biz_code = #{record.executeBizCode,jdbcType=VARCHAR},
+      </if>
+      <if test="record.executeTaskType != null">
+        execute_task_type = #{record.executeTaskType,jdbcType=TINYINT},
+      </if>
+      <if test="record.executeTaskStatus != null">
+        execute_task_status = #{record.executeTaskStatus,jdbcType=TINYINT},
+      </if>
+      <if test="record.executeTaskName != null">
+        execute_task_name = #{record.executeTaskName,jdbcType=VARCHAR},
+      </if>
+      <if test="record.executeTaskDuration != null">
+        execute_task_duration = #{record.executeTaskDuration,jdbcType=BIGINT},
+      </if>
+      <if test="record.executeTaskResult != null">
+        execute_task_result = #{record.executeTaskResult,jdbcType=VARCHAR},
+      </if>
+      <if test="record.executeStartTime != null">
+        execute_start_time = #{record.executeStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.executeStopTime != null">
+        execute_stop_time = #{record.executeStopTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.executeInputParam != null">
+        execute_input_param = #{record.executeInputParam,jdbcType=CHAR},
+      </if>
+      <if test="record.isDelete != null">
+        is_delete = #{record.isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="record.departmentId != null">
+        department_id = #{record.departmentId,jdbcType=BIGINT},
+      </if>
+      <if test="record.enterpriseId != null">
+        enterprise_id = #{record.enterpriseId,jdbcType=BIGINT},
+      </if>
+      <if test="record.userId != null">
+        user_id = #{record.userId,jdbcType=BIGINT},
+      </if>
+      <if test="record.updateTime != null">
+        update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.createTime != null">
+        create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.resultDataSize != null">
+        result_data_size = #{record.resultDataSize,jdbcType=BIGINT},
+      </if>
+      <if test="record.resultExpireTime != null">
+        result_expire_time = #{record.resultExpireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="record.failureRetryCount != null">
+        failure_retry_count = #{record.failureRetryCount,jdbcType=INTEGER},
+      </if>
+      <if test="record.failureReason != null">
+        failure_reason = #{record.failureReason,jdbcType=VARCHAR},
+      </if>
+    </set>
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByExample" parameterType="map">
+    update execute_task_info
+    set execute_task_id = #{record.executeTaskId,jdbcType=BIGINT},
+      execute_task_code = #{record.executeTaskCode,jdbcType=VARCHAR},
+      execute_biz_code = #{record.executeBizCode,jdbcType=VARCHAR},
+      execute_task_type = #{record.executeTaskType,jdbcType=TINYINT},
+      execute_task_status = #{record.executeTaskStatus,jdbcType=TINYINT},
+      execute_task_name = #{record.executeTaskName,jdbcType=VARCHAR},
+      execute_task_duration = #{record.executeTaskDuration,jdbcType=BIGINT},
+      execute_task_result = #{record.executeTaskResult,jdbcType=VARCHAR},
+      execute_start_time = #{record.executeStartTime,jdbcType=TIMESTAMP},
+      execute_stop_time = #{record.executeStopTime,jdbcType=TIMESTAMP},
+      execute_input_param = #{record.executeInputParam,jdbcType=CHAR},
+      is_delete = #{record.isDelete,jdbcType=TINYINT},
+      department_id = #{record.departmentId,jdbcType=BIGINT},
+      enterprise_id = #{record.enterpriseId,jdbcType=BIGINT},
+      user_id = #{record.userId,jdbcType=BIGINT},
+      update_time = #{record.updateTime,jdbcType=TIMESTAMP},
+      create_time = #{record.createTime,jdbcType=TIMESTAMP},
+      result_data_size = #{record.resultDataSize,jdbcType=BIGINT},
+      result_expire_time = #{record.resultExpireTime,jdbcType=TIMESTAMP},
+      failure_retry_count = #{record.failureRetryCount,jdbcType=INTEGER},
+      failure_reason = #{record.failureReason,jdbcType=VARCHAR}
+    <if test="_parameter != null">
+      <include refid="Update_By_Example_Where_Clause" />
+    </if>
+  </update>
+  <update id="updateByPrimaryKeySelective" parameterType="com.hyts.assemble.taskqueue.model.ExecuteTaskInfo">
+    update execute_task_info
+    <set>
+      <if test="executeTaskCode != null">
+        execute_task_code = #{executeTaskCode,jdbcType=VARCHAR},
+      </if>
+      <if test="executeBizCode != null">
+        execute_biz_code = #{executeBizCode,jdbcType=VARCHAR},
+      </if>
+      <if test="executeTaskType != null">
+        execute_task_type = #{executeTaskType,jdbcType=TINYINT},
+      </if>
+      <if test="executeTaskStatus != null">
+        execute_task_status = #{executeTaskStatus,jdbcType=TINYINT},
+      </if>
+      <if test="executeTaskName != null">
+        execute_task_name = #{executeTaskName,jdbcType=VARCHAR},
+      </if>
+      <if test="executeTaskDuration != null">
+        execute_task_duration = #{executeTaskDuration,jdbcType=BIGINT},
+      </if>
+      <if test="executeTaskResult != null">
+        execute_task_result = #{executeTaskResult,jdbcType=VARCHAR},
+      </if>
+      <if test="executeStartTime != null">
+        execute_start_time = #{executeStartTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="executeStopTime != null">
+        execute_stop_time = #{executeStopTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="executeInputParam != null">
+        execute_input_param = #{executeInputParam,jdbcType=CHAR},
+      </if>
+      <if test="isDelete != null">
+        is_delete = #{isDelete,jdbcType=TINYINT},
+      </if>
+      <if test="departmentId != null">
+        department_id = #{departmentId,jdbcType=BIGINT},
+      </if>
+      <if test="enterpriseId != null">
+        enterprise_id = #{enterpriseId,jdbcType=BIGINT},
+      </if>
+      <if test="userId != null">
+        user_id = #{userId,jdbcType=BIGINT},
+      </if>
+      <if test="updateTime != null">
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="createTime != null">
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="resultDataSize != null">
+        result_data_size = #{resultDataSize,jdbcType=BIGINT},
+      </if>
+      <if test="resultExpireTime != null">
+        result_expire_time = #{resultExpireTime,jdbcType=TIMESTAMP},
+      </if>
+      <if test="failureRetryCount != null">
+        failure_retry_count = #{failureRetryCount,jdbcType=INTEGER},
+      </if>
+      <if test="failureReason != null">
+        failure_reason = #{failureReason,jdbcType=VARCHAR},
+      </if>
+    </set>
+    where execute_task_id = #{executeTaskId,jdbcType=BIGINT}
+  </update>
+  <update id="updateByPrimaryKey" parameterType="com.hyts.assemble.taskqueue.model.ExecuteTaskInfo">
+    update execute_task_info
+    set execute_task_code = #{executeTaskCode,jdbcType=VARCHAR},
+      execute_biz_code = #{executeBizCode,jdbcType=VARCHAR},
+      execute_task_type = #{executeTaskType,jdbcType=TINYINT},
+      execute_task_status = #{executeTaskStatus,jdbcType=TINYINT},
+      execute_task_name = #{executeTaskName,jdbcType=VARCHAR},
+      execute_task_duration = #{executeTaskDuration,jdbcType=BIGINT},
+      execute_task_result = #{executeTaskResult,jdbcType=VARCHAR},
+      execute_start_time = #{executeStartTime,jdbcType=TIMESTAMP},
+      execute_stop_time = #{executeStopTime,jdbcType=TIMESTAMP},
+      execute_input_param = #{executeInputParam,jdbcType=CHAR},
+      is_delete = #{isDelete,jdbcType=TINYINT},
+      department_id = #{departmentId,jdbcType=BIGINT},
+      enterprise_id = #{enterpriseId,jdbcType=BIGINT},
+      user_id = #{userId,jdbcType=BIGINT},
+      update_time = #{updateTime,jdbcType=TIMESTAMP},
+      create_time = #{createTime,jdbcType=TIMESTAMP},
+      result_data_size = #{resultDataSize,jdbcType=BIGINT},
+      result_expire_time = #{resultExpireTime,jdbcType=TIMESTAMP},
+      failure_retry_count = #{failureRetryCount,jdbcType=INTEGER},
+      failure_reason = #{failureReason,jdbcType=VARCHAR}
+    where execute_task_id = #{executeTaskId,jdbcType=BIGINT}
+  </update>
+</mapper>

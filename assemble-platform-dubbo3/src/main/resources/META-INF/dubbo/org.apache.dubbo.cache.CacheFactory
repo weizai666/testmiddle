@@ -1,0 +1,1 @@
+redis=com.hyts.assemble.dubbo3.comp.cache.RedisCacheFactory

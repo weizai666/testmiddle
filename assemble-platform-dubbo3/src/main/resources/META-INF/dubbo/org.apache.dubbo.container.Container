@@ -1,0 +1,6 @@
+undertow=com.hyts.assemble.dubbo3.comp.container.UnderTowContainer
+jetty=com.hyts.assemble.dubbo3.comp.container.JettyContainer
+log4j=com.hyts.assemble.dubbo3.comp.container.Log4jContainer
+
+jetty2=com.hyts.assemble.dubbo3.comp.context.JettyContextContainer
+undertow2=com.hyts.assemble.dubbo3.comp.context.UnderTowContextContainer

@@ -1,0 +1,17 @@
+
+server:
+  port: 8005
+
+spring:
+  application:
+    name: batchProcess
+  aop:
+    proxy-target-class: true
+  profiles:
+    active: dev
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'

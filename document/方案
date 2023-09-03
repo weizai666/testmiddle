@@ -3,90 +3,7 @@ Java 安装：在计算机上安装 Java 开发工具包 (JDK)。
 IDE 设置：下载并安装集成开发环境 (IDE)。
 Spring Boot 项目：使用 IDE 或 Spring Initializr 创建新的 Spring Boot 项目。
 
-第 2 步：创建核心组件
-（1）DelayedQueueConfiguration类：
-该类保存了Redisson和延迟队列的所有配置设置。
-使用Spring的@Configuration注解来表明它是一个配置类。
-DelayedQueueConfiguration 类充当可配置框架，用于初始化和管理分布式系统中的延迟任务执行。 它与Redisson集成进行任务存储，并提供任务调度的动态算法选择。其主要组成部分如下：
---DelayedRedissionClientTool：初始化为延迟任务量身定制的Redisson客户端。它是一个用于与Redisson客户端进行交互的工具类。该类主要用于操作Redisson提供的阻塞队列（RBlockingQueue）以实现延时任务的调度和执行。以下是该类的主要组成部分和它们的作用：
-属性：
-1）redissonClientTool：用于与Redisson客户端进行交互。
-方法：
-1）offer：该方法用于向阻塞队列中添加一个元素。它接受一个ExecuteInvokerEvent<T>对象作为参数，并在添加之前进行一些前置校验。
-
-2）takeBlockingQueue：该方法用于获取与给定的事件模型（ExecuteInvokerEvent）对象相关联的阻塞队列。
-3）poll：该方法用于从阻塞队列中取出一个元素。它接受一个阻塞队列（RBlockingQueue）对象作为参数，并返回一个ExecuteInvokerEvent对象。
-
---ThreadPoolExecutors：初始化了两种类型的线程池执行器，一种用于执行任务（ExecuteThreadPoolExecutor），另一种用于循环任务（ExecuteThreadPoolCycle）。 这些执行器是根据系统是IO密集型还是混合密集型机制来配置的。
-
---DelayedThreadPoolSupport：该组件使用两个线程池执行器进行初始化，主要用于初始化轮询线程和执行线程
---DelayedRedisClientSupport：单例模式，初始化DelayedRedissionClientTool ，为延迟任务上下文中的 Redis 客户端支持提供附加功能。
-
---动态算法选择器集成
-该类旨在从独立的动态算法选择器服务获取最新的调度算法。 这是通过定期调用 API 来更新调度策略的调度方法来实现的。具体步骤如下：
-1）添加一个 RestTemplate bean 以进行动态算法选择器服务的API调用。
-2）创建一个 AlgorithmSelectorClient 类的bean，该类负责从动态算法选择器服务中获取最新的算法。
-3）添加一个带有 @Scheduled 注解的方法，以定期获取最新的算法。
-4）在类级别添加 @EnableScheduling 注解以启用 Spring 的调度功能。
-
-
-
-第3步：实现动态算法选择器服务
-实现动态算法的步骤已在发明内容中做了详细的阐述，故不再赘述
-
-第4步：利用动态策略实现任务调度
-（1）--SchedulerController类： 此类具有将任务添加到 Redisson 延迟队列的方法，即把任务提交到redisson的线程池中执行。 另外，使用 AlgorithmSelectorClient方法从动态算法选择器服务中获取最新的调度策略，保存在全局变量中。
-
-可选，用于命令行交互。
-步骤： 创建一个名为 TaskCommandLiner 的 Java 类。 此类将负责调试或手动干预可能需要的任何命令行交互。 它可以使用Spring的CommandLineRunner接口在启动时执行代码。
-
-（2）DelayedThreadPoolExecutor 类：
-该类扩展了 Java 的 ThreadPoolExecutor 类，管理用于执行延迟任务的线程池，里面定义了核心池的大小，最大线程数，队列容量，线程空闲时间，线程组名称等。 可选地，可以重写方法来根据特定需求自定义线程池行为，如上述提及的队列容量，线程空闲时间等。也可扩展其成员属性，以满足不同的开发需求。
-
-（3）DelayedBootstrapRunnable 类：
-
-该类实现了 Runnable 接口。 在 run() 方法中，初始化和启动延迟任务，并且负责从Redisson延迟队列中拉取任务并执行它们。首先，线程获取相关的队列信息，使用redisson的RBlockingQueue，它提供了阻塞获取和阻塞插入的方法，即：如果队列已满，则阻塞等待，直到队列有空闲节点，然后插入数据，插入方式是尾插法。其次使用DelayedThreadPoolSupport中提供的方法获取执行线程池,如果为空则使用默认的线程池
-第 5 步：实施事件处理
-
-（1）ExecutableInvokerListener 接口：
-
-步骤：该接口实现了自定义侦听器接口，使用@FunctionalInterface注解进行标注，标识一个接口是函数式接口的，函数式接口是指仅仅只包含一个抽象方法的接口。该接口提供了线程具体的执行任务的方法（handle）。
-
-（2）EventExecutableInvokerListener 接口：
-
-此接口为业务事件执行器操作的监听接口。继承自ExecutableInvokerListener，使用了泛型P和R，分别表示传入的事件参数类型和返回结果类型，其包含一下主要常量：
-DEFAULT_DELAYED_OSFFET：默认的延时偏移量，值为10。
-DEFAULT_DELAYED_TIMEUNIT：默认的延时单位，设置为秒（TimeUnit.SECONDS）。
-DEFAULT_IS_ASYNC_FLAG：一个布尔值，表示是否可以执行异步操作。默认值为TRUE。
-可选，DEFAULT_RETRY_NUM：默认的重试次数，设置为0，表示暂不支持重试机制。
-DEFAULT_BIZ_GROUP：默认的业务组名称，用于将相关任务存放在同一个线程执行。
-另外，它提供了一个getExecutor()方法，用于获取执行这些业务事件的执行器（线程池）。这样，具体的业务逻辑可以根据这些设置进行调度和执行。
-（3）DelayedExceptionHandler 接口：
- 此接口将专门处理在延迟任务上下文中专门发生的异常。此接口同样为函数式接口，提供catchException捕获异常的方法，可选，可自定义参数，本实施方案中为该方法提供Throwable ,Thread 两种参数，分别表示出现的异常信息和当前发生异常的线程
-（4）ExecutableExceptionHandler 
- 此类将包含捕获和处理任务执行期间可能发生的异常的方法。继承线程异常类UncaughtExceptionHandler。其中，成员变量包含了上述的DelayedExceptionHandler，使其作为一个List，复写uncaughtException()方法对列表中的异常进行顺序处理
-（5）DelayedBootstrapInitializer：
-主要负责初始化延迟队列的监听器和异常处理器，并进行资源分配。
-首先，定义属性：
-定义存储延时队列的监听器listenerMap，在成员属性上添加@DQListener注解
-定义延时队列的异常处理器exceptionMap，在成员属性上添加@DQExceptionHandler注解
-其次，定义方法，分为以下三部分：
-init：初始化方法，负责启动所有相关的延迟队列监听器和异常处理器。它首先检查是否有有效的监听器和处理器，然后进行资源分配和线程任务分配，启动与生产相关的侦听绑定机制以及开始初始化相关的异常信息处理机制，
-
-getAnnotationMetadataGroupListener 和 getAnnotationMetadataGroupExceptionHandler：这两个方法的作用是获取注解的实例，然后判断是否是DQListener的实例，如果是的话，就强转为DQListener，异常处理器同理。
-getExecutorByGroup：根据监听器列表（EventExecutableInvokerListener）获取执行线程组。
-
-第 6 步：创建注释
-@DQListener 注解：
-创建一个新的Java注解接口，将方法/类标记为延迟队列事件的侦听器。使用Java的@Target和@Retention注解来指定该注解可以在哪里使用以及保留多长时间。
-包含的属性：
-   String value(); 可选，可根据需求定义value的具体含义
-   String group() default "DEFAULT_GROUP"; 分组概念，此方案为默认组机制
-@DQExceptionHandler 注解：
-目的是标准化的方式处理异常。与DQueueListener注解类似，指定其目标和保留策略。
-@EnableDelayedQueue注解：
-目的是启用延迟队列功能。该注解将用在主应用程序类上，以启用与延迟队列相关的所有功能。添加@SpringBootConfiguration以便在初始化时能被spring容器自动处理。无具体属性。
-第 8 步：创建事件模型
+第 2 步：创建事件模型
 （1）ExecuteInvokerEvent类
 此类将保存与调用者事件相关的属性，例如事件类型、有效负载等。为方便解释，采用ApiModelProperty注解对各个属性进行描述，value值为属性说明，required为是否必填，hidden为返回是否隐藏该字段
 
@@ -117,11 +34,97 @@ private int retry;
 @ApiModelProperty(value="异步",name="异步",hidden = true)
 private boolean async;
 
-第9步：初始化延时队列服务
-使用 JUnit 等测试框架以及 Mockito 等模拟库来模拟行为并验证您的组件是否按预期工作。
-集成测试：
+第 3 步：创建核心组件
+（1）DelayedQueueConfiguration类：
+该类保存了Redisson和延迟队列的所有配置设置。
+使用Spring的@Configuration注解来表明它是一个配置类。
+DelayedQueueConfiguration 类充当可配置框架，用于初始化和管理分布式系统中的延迟任务执行。 它与Redisson集成进行任务存储，并提供任务调度的动态算法选择。其主要组成部分如下：
+--DelayedRedissionClientTool：初始化为延迟任务量身定制的Redisson客户端。它是一个用于与Redisson客户端进行交互的工具类。该类主要用于操作Redisson提供的阻塞队列（RBlockingQueue）以实现延时任务的调度和执行。以下是该类的主要组成部分和它们的作用：
+属性：
+redissonClientTool：用于与Redisson客户端进行交互。
+方法：
+1）offer：该方法用于向阻塞队列中添加一个元素。它接受一个ExecuteInvokerEvent<T>对象作为参数，并在添加之前进行一些前置校验。
 
-第 10 步：实施日志记录和监控
-跟踪应用程序事件和错误。使用 SLF4J 或 Logback 等日志记录框架在 Java 类中添加日志记录语句。 根据需要配置日志记录级别和输出格式。
+2）takeBlockingQueue：该方法用于获取与给定的事件模型（ExecuteInvokerEvent）对象相关联的阻塞队列。
+3）poll：该方法用于从阻塞队列中取出一个元素。它接受一个阻塞队列（RBlockingQueue）对象作为参数，并返回一个ExecuteInvokerEvent对象。
+
+--ThreadPoolExecutors：初始化了两种类型的线程池执行器，一种用于执行任务（ExecuteThreadPoolExecutor），另一种用于循环任务（ExecuteThreadPoolCycle）。 这些执行器是根据系统是IO密集型还是混合密集型机制来配置的。
+
+--DelayedThreadPoolSupport：该组件使用两个线程池执行器进行初始化，主要用于初始化轮询线程和执行线程
+--DelayedRedisClientSupport：单例模式，初始化DelayedRedissionClientTool ，为延迟任务上下文中的 Redis 客户端支持提供附加功能。
+
+--动态算法选择器集成
+该类旨在从独立的动态算法选择器服务获取最新的调度算法。 这是通过定期调用 API 来更新调度策略的调度方法来实现的。具体步骤如下：
+1）添加一个 RestTemplate bean 以进行动态算法选择器服务的API调用。
+2）创建一个 AlgorithmSelectorClient 类的bean，该类负责从动态算法选择器服务中获取最新的算法。
+3）添加一个带有 @Scheduled 注解的方法，以定期获取最新的算法。
+4）在类级别添加 @EnableScheduling 注解以启用 Spring 的调度功能。
+
+
+
+第4步：实现动态算法选择器服务
+实现动态算法的步骤已在发明内容中做了详细的阐述，故不再赘述
+
+第5步：利用动态策略实现任务调度
+（1）--SchedulerController类： 此类具有将任务添加到 Redisson 延迟队列的方法，即把任务提交到redisson的线程池中执行。 
+
+另外，使用 AlgorithmSelectorClient方法从动态算法选择器服务中获取最新的调度策略，保存在全局变量中。
+
+可选，用于命令行交互。
+步骤： 创建一个名为 TaskCommandLiner 的 Java 类。 此类将负责调试或手动干预可能需要的任何命令行交互。 它可以使用Spring的CommandLineRunner接口在启动时执行代码。
+
+（2）DelayedThreadPoolExecutor 类：
+该类扩展了 Java 的 ThreadPoolExecutor 类，管理用于执行延迟任务的线程池，里面定义了核心池的大小，最大线程数，队列容量，线程空闲时间，线程组名称等。 可选地，可以重写方法来根据特定需求自定义线程池行为，如上述提及的队列容量，线程空闲时间等。也可扩展其成员属性，以满足不同的开发需求。
+
+（3）DelayedBootstrapRunnable 类：
+
+该类实现了 Runnable 接口。 在 run() 方法中，初始化和启动延迟任务，并且负责从Redisson延迟队列中拉取任务并执行它们。首先，线程获取相关的队列信息，使用redisson的RBlockingQueue，它提供了阻塞获取和阻塞插入的方法，即：如果队列已满，则阻塞等待，直到队列有空闲节点，然后插入数据，插入方式是尾插法。其次使用DelayedThreadPoolSupport中提供的方法获取执行线程池,如果为空则使用默认的线程池
+
+第 6 步：创建注释
+@DQListener 注解：
+创建一个新的Java注解接口，将方法/类标记为延迟队列事件的侦听器。使用Java的@Target和@Retention注解来指定该注解可以在哪里使用以及保留多长时间。
+包含的属性：
+   String value(); 可选，可根据需求定义value的具体含义
+   String group() default "DEFAULT_GROUP"; 分组概念，此方案为默认组机制
+@DQExceptionHandler 注解：
+目的是标准化的方式处理异常。与DQueueListener注解类似，指定其目标和保留策略。
+@EnableDelayedQueue注解：
+目的是启用延迟队列功能。该注解将用在主应用程序类上，以启用与延迟队列相关的所有功能。添加@SpringBootConfiguration以便在初始化时能被spring容器自动处理。无具体属性。
+
+
+第 7 步：实施事件处理
+
+（1）ExecutableInvokerListener 接口：
+
+步骤：该接口实现了自定义侦听器接口，使用@FunctionalInterface注解进行标注，标识一个接口是函数式接口的，函数式接口是指仅仅只包含一个抽象方法的接口。该接口提供了线程具体的执行任务的方法（handle）。
+
+（2）EventExecutableInvokerListener 接口：
+
+此接口为业务事件执行器操作的监听接口。继承自ExecutableInvokerListener，使用了泛型P和R，分别表示传入的事件参数类型和返回结果类型，其包含一下主要常量：
+DEFAULT_DELAYED_OSFFET：默认的延时偏移量，值为10。
+DEFAULT_DELAYED_TIMEUNIT：默认的延时单位，设置为秒（TimeUnit.SECONDS）。
+DEFAULT_IS_ASYNC_FLAG：一个布尔值，表示是否可以执行异步操作。默认值为TRUE。
+可选，DEFAULT_RETRY_NUM：默认的重试次数，设置为0，表示暂不支持重试机制。
+DEFAULT_BIZ_GROUP：默认的业务组名称，用于将相关任务存放在同一个线程执行。
+另外，它提供了一个getExecutor()方法，用于获取执行这些业务事件的执行器（线程池）。这样，具体的业务逻辑可以根据这些设置进行调度和执行。
+（3）DelayedExceptionHandler 接口：
+ 此接口将专门处理在延迟任务上下文中专门发生的异常。此接口同样为函数式接口，提供catchException捕获异常的方法，可选，可自定义参数，本实施方案中为该方法提供Throwable ,Thread 两种参数，分别表示出现的异常信息和当前发生异常的线程
+（4）ExecutableExceptionHandler 
+ 此类将包含捕获和处理任务执行期间可能发生的异常的方法。继承线程异常类UncaughtExceptionHandler。其中，成员变量包含了上述的DelayedExceptionHandler，使其作为一个List，复写uncaughtException()方法对列表中的异常进行顺序处理
+（5）DelayedBootstrapInitializer：
+主要负责初始化延迟队列的监听器和异常处理器，并进行资源分配。
+首先，定义属性：
+定义存储延时队列的监听器listenerMap，在成员属性上添加@DQListener注解
+定义延时队列的异常处理器exceptionMap，在成员属性上添加@DQExceptionHandler注解
+其次，定义方法，分为以下三部分：
+init：初始化方法，负责启动所有相关的延迟队列监听器和异常处理器。它首先检查是否有有效的监听器和处理器，然后进行资源分配和线程任务分配，启动与生产相关的侦听绑定机制以及开始初始化相关的异常信息处理机制，
+
+getAnnotationMetadataGroupListener 和 getAnnotationMetadataGroupExceptionHandler：这两个方法的作用是获取注解的实例，然后判断是否是DQListener的实例，如果是的话，就强转为DQListener，异常处理器同理。
+getExecutorByGroup：根据监听器列表（EventExecutableInvokerListener）获取执行线程组。
+第8步：测试
+（1）使用 JUnit 等测试框架以及 Mockito 等模拟库来模拟行为并验证组件是否按预期工作。
+
+（2）实施日志记录和监控
+跟踪应用程序事件和错误。使用 SLF4J 日志记录框架在 Java 类中添加日志记录语句。 根据需要配置日志记录级别和输出格式。在需要记录的类上添加@Slf4j注解。
 （可选）监控：
 观察应用程序的性能和运行状况。与 Prometheus 和 Grafana 等监控工具集成，以密切关注 CPU 使用率、内存消耗和自定义业务指标等各种指标。
